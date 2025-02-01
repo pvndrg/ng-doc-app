@@ -1,16 +1,32 @@
-<!-- 
-<div class="row">
-    <div class="col">
-        <app-login></app-login>
+<!-- Header Section -->
+<header class="header">
+    <h2>My Website</h2>
+  </header>
+  
+  <div class="container">
+    <!-- Left Section: Website Details -->
+    <div class="left-section">
+      <div class="content">
+        <h1>Welcome to Our Website</h1>
+        <p>Join us and explore a world of amazing features.</p>
+        <ul>
+          <li><i class="fa fa-check-circle"></i> Secure & Fast</li>
+          <li><i class="fa fa-check-circle"></i> User-Friendly</li>
+          <li><i class="fa fa-check-circle"></i> 24/7 Support</li>
+        </ul>
+      </div>
     </div>
-    <div class="col">
-        <app-user></app-user>
+  
+    <!-- Right Section: Router Outlet for Page Content -->
+    <div class="right-section">
+      <div class="card">
+        <router-outlet></router-outlet>
+      </div>
     </div>
-</div> -->
-
-<!-- app.component.html -->
-<div>
-    <router-outlet></router-outlet> <!-- The content for each route will be injected here -->
   </div>
   
+  <!-- Footer Section -->
+  <footer class="footer">
+    <p>&copy; 2024 My Website. All rights reserved.</p>
+  </footer>
   
