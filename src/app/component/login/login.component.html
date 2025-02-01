@@ -1,0 +1,42 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="container mt-4 p-4 border rounded-4 shadow-lg bg-white">
+  <h3 class="text-center mb-3 text-primary">Login</h3>
+
+  <div class="mb-3">
+    <label for="username" class="form-label fw-semibold">Username</label>
+    <input id="username" formControlName="username" class="form-control rounded-3" 
+      [class.is-invalid]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
+    <div class="invalid-feedback" *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
+      Username is required
+    </div>
+  </div>
+
+  <div class="mb-3 position-relative">
+    <label for="password" class="form-label fw-semibold">Password</label>
+    <div class="input-group">
+      <input id="password" [type]="showPassword ? 'text' : 'password'" formControlName="password"
+        class="form-control rounded-3"
+        [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+      <button type="button" class="btn btn-outline-secondary" (click)="togglePassword()">
+        <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+      </button>
+    </div>
+    <div class="invalid-feedback" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+      Password is required
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-primary w-100 rounded-3 mt-3" [disabled]="loginForm.invalid">Sign In</button>
+
+  <button type="button" class="btn btn-outline-primary w-100 rounded-3 mt-2" (click)="loginForm.reset()">Reset</button>
+  
+  <div class="text-center mt-3">
+    <small>Don't have an account? 
+      <a routerLink="/signup" class="text-decoration-none text-primary">
+        <i class="fa fa-user-plus"></i> Sign Up
+      </a>
+    </small>
+  </div>
+  
+</form>
