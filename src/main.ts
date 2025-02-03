@@ -24,11 +24,12 @@
 // main.ts
 
 import { bootstrapApplication } from '@angular/platform-browser';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { appConfig } from './app/app.config';  // Import your configuration
 import { routes } from './app/app.routes'; // Import your routes
 import { AppComponent } from './app/app.component';  // Your main app component
+import { authInterceptor } from './app/interceptors/auth.interceptor';
 
 // bootstrapApplication(AppComponent, {
 //   providers: [
@@ -43,5 +44,7 @@ bootstrapApplication(AppComponent, {
   providers: [
     provideHttpClient(),
     provideRouter(routes),  // Provide the router with the routes
+    provideHttpClient(withInterceptors([authInterceptor])), // Register the interceptor
+    
   ],
 }).catch(err => console.error(err));

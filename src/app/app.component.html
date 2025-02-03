@@ -1,8 +1,11 @@
-<!-- Header Section -->
-<header class="header">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+<!-- Header Section (Only shown if not logged in) -->
+<div *ngIf="!isLoggedIn()">
+  <header class="header">
     <h2>My Website</h2>
   </header>
-  
+
   <div class="container">
     <!-- Left Section: Website Details -->
     <div class="left-section">
@@ -16,17 +19,24 @@
         </ul>
       </div>
     </div>
-  
+
     <!-- Right Section: Router Outlet for Page Content -->
     <div class="right-section">
       <div class="card">
-        <router-outlet></router-outlet>
+        <router-outlet></router-outlet> <!-- Render page content here -->
       </div>
     </div>
   </div>
-  
+
   <!-- Footer Section -->
   <footer class="footer">
     <p>&copy; 2024 My Website. All rights reserved.</p>
   </footer>
-  
+</div>
+
+<!-- Content Section (Only shown if logged in) -->
+<div *ngIf="isLoggedIn()">
+  <app-sidebar></app-sidebar>  <!-- Sidebar for logged-in users -->
+
+</div>
+

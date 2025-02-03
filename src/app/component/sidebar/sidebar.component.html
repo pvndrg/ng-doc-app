@@ -1,0 +1,29 @@
+<!-- Sidebar Menu -->
+<div class="sidebar" [class.collapsed]="isSidebarCollapsed">
+  <!-- Sidebar Toggle Button -->
+  <button class="sidebar-toggle-btn" (click)="toggleSidebar()">
+    <i class="fa" [ngClass]="isSidebarCollapsed ? 'fa-bars' : 'fa-times'"></i> <!-- Toggle Icon -->
+  </button>
+
+  <!-- Sidebar Menu -->
+  <ul class="menu">
+    <li><a routerLink="/dashboard"><i class="fa fa-tachometer-alt"></i> <span *ngIf="!isSidebarCollapsed">Dashboard</span></a></li>
+
+    <!-- Settings Dropdown -->
+    <li (click)="toggleDropdown()" class="dropdown">
+      <a href="javascript:void(0)"><i class="fa fa-cogs"></i> <span *ngIf="!isSidebarCollapsed">Settings</span></a>
+      <ul *ngIf="isDropdownOpen" class="dropdown-menu">
+        <li><a href="javascript:void(0)">Profile</a></li>
+        <li><a href="javascript:void(0)">Account</a></li>
+      </ul>
+    </li>
+
+    <!-- Logout -->
+    <li><a (click)="logout()"><i class="fa fa-sign-out-alt"></i> <span *ngIf="!isSidebarCollapsed">Logout</span></a></li>
+  </ul>
+</div>
+
+<!-- Main Content Area -->
+<div class="main-content">
+  <router-outlet></router-outlet> <!-- This will render the Dashboard or other components -->
+</div>

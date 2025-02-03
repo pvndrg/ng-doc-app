@@ -17,6 +17,13 @@ html, body {
     flex-direction: column;
   }
   
+/* App Component styles */
+.main-content {
+  margin-right: 250px; /* Ensure content doesn't overlap sidebar */
+  padding: 20px;
+}
+
+
   /* Header Styling */
   .header {
     width: 100%;

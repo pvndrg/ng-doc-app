@@ -1,0 +1,73 @@
+<div class="dashboard">
+  <!-- Header Section -->
+  <header class="dashboard-header">
+    <h1>Dashboard</h1>
+    <div class="user-info">
+      <span>Welcome, <strong>User!</strong></span>
+      <button (click)="logout()"><i class="fa fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </header>
+
+  <!-- Dashboard Overview Stats -->
+  <div class="dashboard-stats">
+    <div class="card">
+      <div class="card-icon"><i class="fa fa-users"></i></div>
+      <div class="card-info">
+        <h3>Total Users</h3>
+        <p>1,245</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-icon"><i class="fa fa-chart-line"></i></div>
+      <div class="card-info">
+        <h3>Revenue</h3>
+        <p>$58,234</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-icon"><i class="fa fa-shopping-cart"></i></div>
+      <div class="card-info">
+        <h3>Orders</h3>
+        <p>764</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-icon"><i class="fa fa-comments"></i></div>
+      <div class="card-info">
+        <h3>Feedback</h3>
+        <p>128</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graphs and Tables -->
+  <div class="dashboard-content">
+    <!-- Revenue Chart -->
+    <div class="chart-container">
+      <h3>Revenue Overview</h3>
+      <canvas id="revenueChart"></canvas> <!-- Chart.js integration -->
+    </div>
+    
+    <!-- Recent User Activity -->
+    <div class="user-activity">
+      <h3>Recent Activities</h3>
+      <table>
+        <tr>
+          <th>User</th>
+          <th>Action</th>
+          <th>Date</th>
+        </tr>
+        <tr>
+          <td>John Doe</td>
+          <td>Purchased a product</td>
+          <td>2025-02-01</td>
+        </tr>
+        <tr>
+          <td>Jane Smith</td>
+          <td>Left a review</td>
+          <td>2025-01-30</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
