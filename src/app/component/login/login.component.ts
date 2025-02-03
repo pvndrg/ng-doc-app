@@ -9,6 +9,7 @@ import {
 import { AuthService } from '../../services/auth.service';
 import { AuthResponse } from '../../models/response/auth-response';
 import { Router, RouterLink } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-login',
@@ -22,7 +23,7 @@ export class LoginComponent implements OnInit {
   authService: AuthService;
    // Inject Router
 
-  constructor(private aService: AuthService, private router: Router) {
+  constructor(private aService: AuthService, private router: Router, private toastr: ToastrService) {
     this.authService = aService;
     this.loginForm = new FormGroup({}); // Initialize an empty FormGroup
   }
@@ -34,26 +35,58 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  // Submit form
   onSubmit(): void {
+    if (this.loginForm.invalid) {
+      this.showValidationErrors();
+      return;
+    }
+  
     const formValue = this.loginForm.value;
-
-    if (this.loginForm.valid) {
-      console.log('Form Submitted!', this.loginForm.value);
-
-      this.authService.login(formValue).subscribe((res: AuthResponse) => {
-        if (res.jwt) {
+    console.log('Form Submitted!', formValue);
+    // this.toastr.success('Hello world!', 'Toastr fun!');
+    this.authService.login(formValue).subscribe({
+      next: (res: AuthResponse) => {
+        if (res?.jwt) {
           this.authService.storeToken(res.jwt);
           console.log('Login successful!');
-          this.router.navigate(['/dashboard']); // Redirect after login
+          this.router.navigate(['/dashboard']);
+          this.toastr.success('Login successful!', 'Success');
+        } else {
+          console.log('Login failed!');
+          this.toastr.error('Invalid credentials. Please try again.', 'Error');
+          
         }
-      });
-    }
+      },
+      error: (err) => {
+        // console.error('API Error:', err);
+        console.log(err);
+        // Ensure error object exists before reading properties
+        const errorMessage = err?.error?.message || 'Server error. Please try again later.';
+        this.toastr.error(errorMessage, 'Error');
+        // this.toastr.success('Hello world!', 'Toastr fun!');
+      }
+    });
   }
+  
 
   showPassword: boolean = false;
 
   togglePassword() {
     this.showPassword = !this.showPassword;
   }
+
+  private showValidationErrors(): void {
+    if (!this.loginForm.controls['email'].valid) {
+      this.toastr.error('Please enter a valid email address.', 'Validation Error');
+    }
+    if (!this.loginForm.controls['password'].valid) {
+      this.toastr.error('Password must be at least 6 characters long.', 'Validation Error');
+    }
+  }
 }
+
+
+// this.toastr.success('Success message', 'Title');
+// this.toastr.error('Error message', 'Title');
+// this.toastr.warning('Warning message', 'Title');
+// this.toastr.info('Info message', 'Title');

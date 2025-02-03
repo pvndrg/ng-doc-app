@@ -30,6 +30,9 @@ import { appConfig } from './app/app.config';  // Import your configuration
 import { routes } from './app/app.routes'; // Import your routes
 import { AppComponent } from './app/app.component';  // Your main app component
 import { authInterceptor } from './app/interceptors/auth.interceptor';
+import { ToastrModule } from 'ngx-toastr';
+import { importProvidersFrom } from '@angular/core';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 // bootstrapApplication(AppComponent, {
 //   providers: [
@@ -45,6 +48,14 @@ bootstrapApplication(AppComponent, {
     provideHttpClient(),
     provideRouter(routes),  // Provide the router with the routes
     provideHttpClient(withInterceptors([authInterceptor])), // Register the interceptor
+    importProvidersFrom(
+      BrowserAnimationsModule,
+      ToastrModule.forRoot({
+        positionClass: 'toast-top-right', // Toast position
+        timeOut: 3000, // Auto close time (ms)
+        preventDuplicates: true, // Avoid duplicate messages
+      })
+    ),
     
   ],
 }).catch(err => console.error(err));

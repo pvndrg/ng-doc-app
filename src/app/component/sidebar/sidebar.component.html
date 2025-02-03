@@ -9,6 +9,8 @@
   <ul class="menu">
     <li><a routerLink="/dashboard"><i class="fa fa-tachometer-alt"></i> <span *ngIf="!isSidebarCollapsed">Dashboard</span></a></li>
 
+    <li><a routerLink="/user"><i class="fa fa-tachometer-alt"></i> <span *ngIf="!isSidebarCollapsed">User Master</span></a></li>
+
     <!-- Settings Dropdown -->
     <li (click)="toggleDropdown()" class="dropdown">
       <a href="javascript:void(0)"><i class="fa fa-cogs"></i> <span *ngIf="!isSidebarCollapsed">Settings</span></a>

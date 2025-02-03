@@ -1,7 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { UserRequest } from '../models/request/user-request';
 import { Observable } from 'rxjs';
+import { User } from '../models/user';
 
 @Injectable({
   providedIn: 'root'
@@ -13,15 +14,34 @@ export class UserService {
 
   constructor(private http: HttpClient) {}
 
+
+  // Function to get the JWT token from localStorage (or wherever it's stored)
+  private getAuthToken(): string | null {
+    return localStorage.getItem('authToken'); // Replace with your method of storing the token
+  }
+
   // Create User (POST request)
   createUser(userData: UserRequest): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/create`, userData);
+    return this.http.post<any>(`http://localhost:8080/api/auth/create`, userData);
   }
 
   // Get User by Username (GET request)
   getUserByUsername(username: string): Observable<UserRequest> {
     return this.http.get<UserRequest>(`${this.apiUrl}/${username}`);
   }
+
+  // Get all users with JWT token included in the headers
+  getAllUsers(): Observable<User[]> {
+    const token = this.getAuthToken();
+
+    // Set the token in the Authorization header if it exists
+    const headers = token
+      ? new HttpHeaders().set('Authorization', `Bearer ${token}`)
+      : new HttpHeaders();
+
+    return this.http.get<User[]>(`${this.apiUrl}`, { headers });
+  }
+  
 
   // Update User (PUT request)
   updateUser(userData: UserRequest): Observable<any> {
