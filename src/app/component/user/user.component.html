@@ -1,6 +1,15 @@
 <!-- app.component.html -->
 
-<table class="table table-striped">
+
+<!-- The AG Grid component -->
+<ag-grid-angular
+      style="width: 100%; height: 500px;"
+      class="ag-theme-alpine"
+      [rowData]="rowData"
+      [columnDefs]="columnDefs">
+    </ag-grid-angular>
+
+<!-- <table class="table table-striped">
     <thead>
       <tr>
         <th>ID</th>
@@ -36,4 +45,4 @@
       </tr>
     </tbody>
   </table>
-  
+   -->

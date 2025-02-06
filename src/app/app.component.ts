@@ -9,7 +9,7 @@ import { SidebarComponent } from './component/sidebar/sidebar.component';
 @Component({
   selector: 'app-root',
 
-  imports: [CommonModule, RouterOutlet, SidebarComponent],  // Include RouterLink and RouterOutlet
+  imports: [CommonModule, RouterOutlet, SidebarComponent ],  // Include RouterLink and RouterOutlet
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })

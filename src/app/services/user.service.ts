@@ -22,7 +22,7 @@ export class UserService {
 
   // Create User (POST request)
   createUser(userData: UserRequest): Observable<any> {
-    return this.http.post<any>(`http://localhost:8080/api/auth/create`, userData);
+    return this.http.post<any>(`http://localhost:8080/auth/create`, userData);
   }
 
   // Get User by Username (GET request)

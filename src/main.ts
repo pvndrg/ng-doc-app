@@ -33,6 +33,7 @@ import { authInterceptor } from './app/interceptors/auth.interceptor';
 import { ToastrModule } from 'ngx-toastr';
 import { importProvidersFrom } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 
 // bootstrapApplication(AppComponent, {
 //   providers: [
@@ -42,6 +43,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 //   ]
 // }).catch(err => console.error(err));
 
+
+// ✅ Register all Community features for Ag-Grid
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 bootstrapApplication(AppComponent, {
   providers: [
