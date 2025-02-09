@@ -1,115 +1,113 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormGroup,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { UserService } from '../../services/user.service';
-import { UserRequest } from '../../models/request/user-request';
-import { RouterLink } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { User } from '../../models/user';
-
 import { AgGridModule } from 'ag-grid-angular';
-import { AllCommunityModule, ColDef, ModuleRegistry } from 'ag-grid-community';
-
+import { ColDef } from 'ag-grid-community';
+import { PaginationRequest } from '../../models/pagination-request';
 
 @Component({
   selector: 'app-user',
-  standalone: true,  // Mark the component as standalone
-  imports: [
-    ReactiveFormsModule,
-    CommonModule,
-    AgGridModule
-    
-  ],
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule, AgGridModule],
   templateUrl: './user.component.html',
-  styleUrl: './user.component.css'
+  styleUrls: ['./user.component.css'],
 })
 export class UserComponent implements OnInit {
+  columnDefs: ColDef<any>[] = [
+    { field: 'id' },
+    { field: 'username' },
+    { field: 'password' },
+    { field: 'email' },
+    { field: 'mobile' },
+    { field: 'firstName' },
+    { field: 'lastName' },
+    { field: 'isActive' },
+    { field: 'emailVerified' },
+    { field: 'mobileVerified' },
+    { field: 'userLocked' },
+    {
+      field: 'roles',
+      valueGetter: (params) => {
+        const roles = params.data.roles || [];
+        return roles.map((role: { roleName: string }) => role.roleName).join(', ');
+      },
+    },
+    { field: 'createdBy' },
+    { field: 'createdDate' },
+    { field: 'modifiedBy' },
+    { field: 'modifiedDate' },
+  ];
 
-// ✅ Fix: Explicitly type columnDefs as ColDef<any>[]
-// ✅ Column Definitions (Use correct field names)
-// columnDefs: ColDef<any>[] = [
-//   { field: 'firstName', headerName: 'First Name' },
-//   { field: 'email', headerName: 'Email' },
-//   { field: 'role', headerName: 'Role' }
-// ];
-
-columnDefs: ColDef<any>[] = [
-  { field: 'id' },
-  { field: 'username' },
-  { field: 'password' },
-  { field: 'email' },
-  { field: 'mobile' },
-  { field: 'firstName' },
-  { field: 'lastName' },
-  { field: 'isActive' },
-  { field: 'emailVerified' },
-  { field: 'mobileVerified' },
-  { field: 'userLocked' },
-  {
-    field: 'roles',
-    valueGetter: (params) => {
-      const roles: { id: number; roleName: string }[] = params.data.roles || [];
-      return roles.map((role: { roleName: string }) => role.roleName).join(', ');
-    }
-  },
-  { field: 'createdBy' },
-  { field: 'createdDate' },
-  { field: 'modifiedBy' },
-  { field: 'modifiedDate' }
-];
-
-
-rowData: any[] = []; // ✅ Initialize rowData as an empty array
-
-
-  // rowData = [
-  //   { name: 'John Doe', email: 'john@example.com', role: 'Admin' },
-  //   { name: 'Jane Smith', email: 'jane@example.com', role: 'User' }
-  // ];
-  
+  rowData: any[] = [];
   userForm: FormGroup;
-  userService: UserService;
-
   users: User[] = [];
 
+  paginationPageSize = 5;
+  paginationPageSizeSelector = [5, 20, 50, 100];
 
-  constructor(private uService: UserService, private toastr: ToastrService) {
-    this.userService = uService;
-    this.userForm = new FormGroup({}); // Initialize an empty FormGroup
+  private gridApi: any;
+  private gridColumnApi: any;
+  private isDataLoaded = false;
+
+  constructor(private userService: UserService, private toastr: ToastrService) {
+    this.userForm = new FormGroup({});
   }
 
-  ngOnInit(): void {
-    this.getAllUser();
+  ngOnInit(): void {}
+
+  onGridReady(params: any) {
+    this.gridApi = params.api;
+    this.gridColumnApi = params.columnApi;
+    this.getAllUser(1, this.paginationPageSize);
   }
 
-  // getAllUser(): void {
-  //   this.userService.getAllUsers().subscribe({
-  //     next: (users) => {
-  //       this.users = users;
-  //       console.log('Fetched Users:', users);
+  onPaginationChanged() {
+    if (!this.gridApi) return;
 
-  //       // ✅ Transform `users` into `rowData` format required by Ag-Grid
-  //       this.rowData = users.map(user => ({
-  //         firstName: user.firstName, 
-  //         email: user.email,
-  //         role: user.roles.length ? user.roles.map(r => r.roleName).join(', ') : 'No Role' 
-  //       }));
+    const currentPage = this.gridApi.paginationGetCurrentPage() + 1;
+    const pageSize = this.gridApi.paginationGetPageSize();
 
-  //       this.toastr.success('Users fetched successfully!', 'Success');
-  //     },
-  //     error: (err) => {
-  //       console.error('Error fetching users:', err);
-  //       this.toastr.error('An error occurred while fetching users. Please try again later.', 'Error');
-  //     }
-  //   });
-  // }
+    if (this.paginationPageSize !== pageSize) {
+      this.paginationPageSize = pageSize;
+      this.isDataLoaded = false; // Allow new API call
+    }
 
-  getAllUser(): void {
-    this.userService.getAllUsers().subscribe({
+    this.getAllUser(currentPage, this.paginationPageSize);
+  }
+
+  onPageSizeChanged(newPageSize: number) {
+    this.paginationPageSize = newPageSize;
+    this.isDataLoaded = false;
+    this.getAllUser(1, this.paginationPageSize);
+  }
+
+  getAllUser(pageNumber: number = 1, pageSize: number = 10): void {
+    if (this.isDataLoaded && this.paginationPageSize === pageSize) return;
+    this.isDataLoaded = true;
+    this.paginationPageSize = pageSize;
+
+    const paginationRequest: PaginationRequest = {
+      pageNumber,
+      pageSize,
+      sortFields: ['name', 'email'],
+      sortDirections: ['asc', 'desc'],
+      searchFields: ['role', 'status'],
+      searchValues: ['admin', 'active'],
+    };
+
+    this.userService.getAllUsers(paginationRequest).subscribe({
       next: (users) => {
         this.users = users;
-        this.rowData = users; // Assign users directly to rowData for AG Grid
-        console.log('Fetched Users:', users);
+        this.rowData = [...users];
+        if (this.gridApi) {
+          this.gridApi.setRowData(this.rowData);
+        }
         this.toastr.success('Users fetched successfully!', 'Success');
       },
       error: (err) => {

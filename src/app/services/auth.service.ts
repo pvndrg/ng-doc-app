@@ -9,6 +9,8 @@ import { Observable } from 'rxjs';
 export class AuthService {
   private apiUrl = 'http://localhost:8080/auth'; // Replace with actual API
 
+  private TOKEN_KEY = 'jwtToken';
+
   constructor(private http: HttpClient) {}
 
   // Create User (POST request)
@@ -19,6 +21,10 @@ export class AuthService {
   // Store JWT token in LocalStorage
   storeToken(token: string): void {
     localStorage.setItem('jwtToken', token);
+  }
+
+  removeToken(): void {
+    localStorage.removeItem(this.TOKEN_KEY);
   }
 
   // Retrieve JWT token

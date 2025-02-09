@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { UserRequest } from '../models/request/user-request';
 import { Observable } from 'rxjs';
 import { User } from '../models/user';
+import { PaginationRequest } from '../models/pagination-request';
 
 @Injectable({
   providedIn: 'root'
@@ -31,16 +32,17 @@ export class UserService {
   }
 
   // Get all users with JWT token included in the headers
-  getAllUsers(): Observable<User[]> {
+  getAllUsers(paginationRequest: PaginationRequest): Observable<User[]> {
     const token = this.getAuthToken();
-
-    // Set the token in the Authorization header if it exists
+  
+    // Set the Authorization header
     const headers = token
       ? new HttpHeaders().set('Authorization', `Bearer ${token}`)
       : new HttpHeaders();
-
-    return this.http.get<User[]>(`${this.apiUrl}`, { headers });
+  
+    return this.http.post<User[]>(`${this.apiUrl}/get-all`, paginationRequest, { headers });
   }
+  
   
 
   // Update User (PUT request)

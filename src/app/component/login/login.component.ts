@@ -35,6 +35,39 @@ export class LoginComponent implements OnInit {
     });
   }
 
+  // onSubmit(): void {
+  //   if (this.loginForm.invalid) {
+  //     this.showValidationErrors();
+  //     return;
+  //   }
+  
+  //   const formValue = this.loginForm.value;
+  //   console.log('Form Submitted!', formValue);
+  //   // this.toastr.success('Hello world!', 'Toastr fun!');
+  //   this.authService.login(formValue).subscribe({
+  //     next: (res: AuthResponse) => {
+  //       if (res?.jwt) {
+  //         this.authService.storeToken(res.jwt);
+  //         console.log('Login successful!');
+  //         this.router.navigate(['/dashboard']);
+  //         this.toastr.success('Login successful!', 'Success');
+  //       } else {
+  //         console.log('Login failed!');
+  //         this.toastr.error('Invalid credentials. Please try again.', 'Error');
+          
+  //       }
+  //     },
+  //     error: (err) => {
+  //       // console.error('API Error:', err);
+  //       console.log(err);
+  //       // Ensure error object exists before reading properties
+  //       const errorMessage = err?.error?.message || 'Server error. Please try again later.';
+  //       this.toastr.error(errorMessage, 'Error');
+  //       // this.toastr.success('Hello world!', 'Toastr fun!');
+  //     }
+  //   });
+  // }
+
   onSubmit(): void {
     if (this.loginForm.invalid) {
       this.showValidationErrors();
@@ -43,7 +76,7 @@ export class LoginComponent implements OnInit {
   
     const formValue = this.loginForm.value;
     console.log('Form Submitted!', formValue);
-    // this.toastr.success('Hello world!', 'Toastr fun!');
+  
     this.authService.login(formValue).subscribe({
       next: (res: AuthResponse) => {
         if (res?.jwt) {
@@ -54,19 +87,24 @@ export class LoginComponent implements OnInit {
         } else {
           console.log('Login failed!');
           this.toastr.error('Invalid credentials. Please try again.', 'Error');
-          
         }
       },
       error: (err) => {
-        // console.error('API Error:', err);
         console.log(err);
-        // Ensure error object exists before reading properties
+  
+        const statusCode = err?.status;
         const errorMessage = err?.error?.message || 'Server error. Please try again later.';
-        this.toastr.error(errorMessage, 'Error');
-        // this.toastr.success('Hello world!', 'Toastr fun!');
+  
+        if (statusCode === 401) {
+          this.authService.removeToken(); // Remove the token if status is 401
+          this.toastr.error('Session expired or invalid credentials. Please log in again.', 'Unauthorized');
+        } else {
+          this.toastr.error(errorMessage, 'Error');
+        }
       }
     });
   }
+  
   
 
   showPassword: boolean = false;
