@@ -1,15 +1,19 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import {
+  FormControl,
   FormGroup,
   ReactiveFormsModule,
+  Validators,
 } from '@angular/forms';
 import { UserService } from '../../services/user.service';
+import { UserRequest } from '../../models/request/user-request';
 import { ToastrService } from 'ngx-toastr';
 import { User } from '../../models/user';
 import { AgGridModule } from 'ag-grid-angular';
 import { ColDef } from 'ag-grid-community';
 import { PaginationRequest } from '../../models/pagination-request';
+import { PaginationResponse } from '../../models/pagination-response';
 
 @Component({
   selector: 'app-user',
@@ -34,8 +38,8 @@ export class UserComponent implements OnInit {
     {
       field: 'roles',
       valueGetter: (params) => {
-        const roles = params.data.roles || [];
-        return roles.map((role: { roleName: string }) => role.roleName).join(', ');
+        const roles: { roleName: string }[] = params.data.roles || [];
+        return roles.map((role) => role.roleName).join(', ');
       },
     },
     { field: 'createdBy' },
@@ -47,73 +51,82 @@ export class UserComponent implements OnInit {
   rowData: any[] = [];
   userForm: FormGroup;
   users: User[] = [];
-
-  paginationPageSize = 5;
-  paginationPageSizeSelector = [5, 20, 50, 100];
-
+  paginationPageSize = 5; // Default page size
+  paginationPageSizeSelector = [5, 10, 50, 100]; // Allowed page sizes
+  currentPage = 1;
   private gridApi: any;
-  private gridColumnApi: any;
-  private isDataLoaded = false;
+  private isFirstLoad = true; // Prevents unnecessary API call on gridReady
 
   constructor(private userService: UserService, private toastr: ToastrService) {
-    this.userForm = new FormGroup({});
+    this.userForm = new FormGroup({
+      username: new FormControl('', Validators.required),
+      email: new FormControl('', [Validators.required, Validators.email]),
+      role: new FormControl(''),
+      status: new FormControl(''),
+    });
   }
 
   ngOnInit(): void {}
 
+  // Handle Grid Ready event
   onGridReady(params: any) {
     this.gridApi = params.api;
-    this.gridColumnApi = params.columnApi;
-    this.getAllUser(1, this.paginationPageSize);
+    this.gridApi.setGridOption('pagination', true); // Ensure pagination is enabled
+    this.getAllUser(this.currentPage, this.paginationPageSize);
   }
 
-  onPaginationChanged() {
-    if (!this.gridApi) return;
-
-    const currentPage = this.gridApi.paginationGetCurrentPage() + 1;
-    const pageSize = this.gridApi.paginationGetPageSize();
-
-    if (this.paginationPageSize !== pageSize) {
-      this.paginationPageSize = pageSize;
-      this.isDataLoaded = false; // Allow new API call
+  // Handle Pagination Changes (Page Number or Page Size)
+  onPaginationChanged(params: any) {
+    if (this.isFirstLoad) {
+      this.isFirstLoad = false; // Skip the first pagination event on load
+      return;
     }
-
-    this.getAllUser(currentPage, this.paginationPageSize);
+  
+    if (params.api) {
+      const newPageNumber = params.api.paginationGetCurrentPage() + 1; // ✅ No need for +1
+      const newPageSize = params.api.paginationGetPageSize();
+  
+      // Check if page or size actually changed before making an API call
+      if (newPageNumber !== this.currentPage || newPageSize !== this.paginationPageSize) {
+        this.currentPage = newPageNumber;
+        this.paginationPageSize = newPageSize;
+        this.getAllUser(this.currentPage, this.paginationPageSize);
+      }
+    }
   }
+  
 
-  onPageSizeChanged(newPageSize: number) {
-    this.paginationPageSize = newPageSize;
-    this.isDataLoaded = false;
-    this.getAllUser(1, this.paginationPageSize);
-  }
-
-  getAllUser(pageNumber: number = 1, pageSize: number = 10): void {
-    if (this.isDataLoaded && this.paginationPageSize === pageSize) return;
-    this.isDataLoaded = true;
-    this.paginationPageSize = pageSize;
-
+  getAllUser(pageNumber: number = 0, pageSize: number = 10): void {
     const paginationRequest: PaginationRequest = {
-      pageNumber,
+      pageNumber: pageNumber - 1, // ✅ Convert 1-based page to 0-based
       pageSize,
       sortFields: ['name', 'email'],
       sortDirections: ['asc', 'desc'],
       searchFields: ['role', 'status'],
       searchValues: ['admin', 'active'],
     };
-
+  
     this.userService.getAllUsers(paginationRequest).subscribe({
-      next: (users) => {
-        this.users = users;
-        this.rowData = [...users];
-        if (this.gridApi) {
+      next: (response: PaginationResponse) => {
+        this.users = response.content;
+        this.rowData = [...response.content];
+  
+        if (this.gridApi && this.gridApi.setRowData) {
           this.gridApi.setRowData(this.rowData);
+        } else {
+          console.error('gridApi is not properly initialized.');
         }
+  
+        console.log('Fetched Users:', response.content);
         this.toastr.success('Users fetched successfully!', 'Success');
       },
       error: (err) => {
         console.error('Error fetching users:', err);
-        this.toastr.error('An error occurred while fetching users. Please try again later.', 'Error');
+        this.toastr.error(
+          'An error occurred while fetching users. Please try again later.',
+          'Error'
+        );
       },
     });
   }
-}
+  }
